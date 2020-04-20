@@ -33,6 +33,7 @@ router.post("/login", (req, res) => {
       // console.log("user", user[0]);
       // If we find the user, then also check that the passwords match
       if(user && bcrypt.compareSync(password, user[0].password)) {
+        req.session.loggedIn = true;
         res.status(200).json({ message: "Welcome!" });
       } else {
         res.status(401).json({ message: "You cannot pass!"})
