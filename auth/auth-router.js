@@ -25,4 +25,24 @@ router.post("/register", (req, res) => {
     });
 });
 
+router.post("/login", (req, res) => {
+  let { username, password } = req.body;
+  // Search for the user using the username
+  Users.findBy({ username })
+    .then(user => {
+      // console.log("user", user[0]);
+      // If we find the user, then also check that the passwords match
+      if(user && bcrypt.compareSync(password, user[0].password)) {
+        res.status(200).json({ message: "Welcome!" });
+      } else {
+        res.status(401).json({ message: "You cannot pass!"})
+      }
+      
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({ errorMessage: error.message });
+    });
+});
+
 module.exports = router;
