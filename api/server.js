@@ -15,7 +15,7 @@ const sessionConfig = {
   resave: false,
   saveUninitialized: process.env.SEND_COOKIES || true,
   cookie: {
-    maxAge: 1000 * 10, // Good for 10 min in ms
+    maxAge: 1000 * 60 * 10, // Good for 10 min in ms
     secure: process.env.USE_SECURE_COOKIES || false, // used over https only, set to true in production
     httpOnly: true, // True = JS on the client cannot access the cookies. 
   },
