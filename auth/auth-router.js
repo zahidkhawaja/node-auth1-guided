@@ -46,4 +46,14 @@ router.post("/login", (req, res) => {
     });
 });
 
+router.get("/logout", (req, res) => {
+  if(req.session) {
+  req.session.destroy(error => {
+    error ? res.status(500).json({ errorMessage: "Unable to logout"}) : res.status(204).end();
+  });
+} else {
+  res.status(204).end();
+}
+});
+
 module.exports = router;
