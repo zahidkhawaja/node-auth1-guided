@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const Users = require("../users/users-model.js");
 
@@ -33,8 +34,10 @@ router.post("/login", (req, res) => {
       // console.log("user", user[0]);
       // If we find the user, then also check that the passwords match
       if(user && bcrypt.compareSync(password, user[0].password)) {
-        req.session.loggedIn = true;
-        res.status(200).json({ message: "Welcome!" });
+        // Produce a token
+        const token = generateToken(user);
+        // Send the token to the client
+        res.status(200).json({ message: "Welcome!", token });
       } else {
         res.status(401).json({ message: "You cannot pass!"})
       }
@@ -46,14 +49,19 @@ router.post("/login", (req, res) => {
     });
 });
 
-router.get("/logout", (req, res) => {
-  if(req.session) {
-  req.session.destroy(error => {
-    error ? res.status(500).json({ errorMessage: "Unable to logout"}) : res.status(204).end();
-  });
-} else {
-  res.status(204).end();
+function generateToken(user) {
+  const payload = {
+    userId: user[0].id,
+    username:  user[0].username
+  };
+
+  const secret = process.env.JWT_SECRET || "blahblahblah";
+
+  const options = {
+    expiresIn: "1d"
+  }
+
+  return jwt.sign(payload, secret, options);
 }
-});
 
 module.exports = router;
