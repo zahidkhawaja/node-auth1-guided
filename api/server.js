@@ -2,10 +2,12 @@ const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
 const session = require("express-session");
+const KnexSessionStore = require("connect-session-knex")(session);
 
 const usersRouter = require("../users/users-router.js");
 const authRouter = require("../auth/auth-router");
-const authenticator = require("../auth/authenticator.js")
+const authenticator = require("../auth/authenticator.js");
+const dbConnection = require("../database/dbConfig");
 
 const server = express();
 
@@ -19,6 +21,13 @@ const sessionConfig = {
     secure: process.env.USE_SECURE_COOKIES || false, // used over https only, set to true in production
     httpOnly: true, // True = JS on the client cannot access the cookies. 
   },
+  store: new KnexSessionStore({
+    knex: dbConnection,
+    tablename: "sessions",
+    sidfieldname: "sid",
+    createtable: true,
+    clearInterval: 1000 * 60 * 60, // Remove expired sessions every hour
+  })
 };
 
 server.use(helmet());
